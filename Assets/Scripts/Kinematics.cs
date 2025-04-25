@@ -63,9 +63,23 @@ public class RobotKinematics : MonoBehaviour
         }
         
         // Calculate individual wheel speeds based on differential drive kinematics
-        // Keep the correct turning behavior
-        float leftWheelSpeed = linearVelocity + (angularVelocity * trackWidth / 2);
-        float rightWheelSpeed = linearVelocity - (angularVelocity * trackWidth / 2);
+        // When reversing, we need to invert the steering effect to maintain proper turning
+        float angularComponent = angularVelocity * trackWidth / 2;
+        float leftWheelSpeed, rightWheelSpeed;
+        
+        // Adjust the differential drive model based on whether we're going forward or reverse
+        if (linearVelocity >= 0)
+        {
+            // Forward motion - normal differential drive
+            leftWheelSpeed = linearVelocity + angularComponent;
+            rightWheelSpeed = linearVelocity - angularComponent;
+        }
+        else
+        {
+            // Reverse motion - invert the angular component for correct reversing behavior
+            leftWheelSpeed = linearVelocity - angularComponent/2;
+            rightWheelSpeed = linearVelocity + angularComponent/2;
+        }
         
         // Apply motor torques to the wheels
         frontLeftWheel.motorTorque = leftWheelSpeed;
@@ -73,7 +87,7 @@ public class RobotKinematics : MonoBehaviour
         frontRightWheel.motorTorque = rightWheelSpeed;
         rearRightWheel.motorTorque = rightWheelSpeed;
         
-        // Apply steering - use the direct angular velocity for correct visual steering
+        // Apply steering - same visual steering regardless of direction
         float steeringAngle = angularVelocity;
         frontLeftWheel.steerAngle = steeringAngle;
         frontRightWheel.steerAngle = steeringAngle;
