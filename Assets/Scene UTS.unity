@@ -1198,7 +1198,7 @@ WheelCollider:
     m_ExtremumValue: 1
     m_AsymptoteSlip: 0.5
     m_AsymptoteValue: 0.75
-    m_Stiffness: 1.5
+    m_Stiffness: 1.8
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -7497,7 +7497,7 @@ WheelCollider:
     m_ExtremumValue: 1
     m_AsymptoteSlip: 0.5
     m_AsymptoteValue: 0.75
-    m_Stiffness: 1.5
+    m_Stiffness: 1.8
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -11280,7 +11280,7 @@ WheelCollider:
     m_ExtremumValue: 1
     m_AsymptoteSlip: 0.5
     m_AsymptoteValue: 0.75
-    m_Stiffness: 1.5
+    m_Stiffness: 1.8
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -19157,9 +19157,9 @@ MonoBehaviour:
   robotKinematics: {fileID: 1410372219}
   maxLinearSpeed: 5
   maxAngularSpeed: 30
-  acceleration: 1
-  deceleration: 2
-  turnAcceleration: 2
+  acceleration: 0.5
+  deceleration: 5
+  turnAcceleration: 5
   showDebugInfo: 1
   useKeyboardInput: 1
   speedText: {fileID: 0}
@@ -19189,8 +19189,6 @@ MonoBehaviour:
   maxSteeringAngle: 30
   wheelBase: 2
   trackWidth: 1.6
-  reverseAngularLimit: 15
-  reverseSpeedLimit: 3
   linearVelocity: 5
   angularVelocity: 5
 --- !u!54 &1410372220
@@ -19645,7 +19643,7 @@ WheelCollider:
     m_ExtremumValue: 1
     m_AsymptoteSlip: 0.5
     m_AsymptoteValue: 0.75
-    m_Stiffness: 1.5
+    m_Stiffness: 1.8
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
