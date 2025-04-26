@@ -34,7 +34,7 @@ public class RobotKinematics : MonoBehaviour
         // Make sure the rigidbody is configured properly
         if (robotRigidbody != null)
         {
-            robotRigidbody.centerOfMass = new Vector3(0, 0, -0.5f);
+            robotRigidbody.centerOfMass = new Vector3(0, -1, -0.5f);
         }
     }
     
