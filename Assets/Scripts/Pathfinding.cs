@@ -28,6 +28,14 @@ public class RobotPathfinding: MonoBehaviour{
         if (target == null){
             currentPathPoint = transform.position;
         }
+        
+        // Initialize the robot kinematics
+        if (robotKinematics != null) {
+            robotKinematics.currentPathPoint = transform.position;
+            robotKinematics.slowingDistance = slowingDistance;
+        } else {
+            Debug.LogError("RobotKinematics reference is missing! Please assign it in the inspector.");
+        }
     }
 
     void FixedUpdate() {
@@ -37,17 +45,30 @@ public class RobotPathfinding: MonoBehaviour{
             // Calculate distance to target
             distanceToTarget = Vector3.Distance(transform.position, target.position);
             
+            // Sync with kinematics
+            if (robotKinematics != null) {
+                robotKinematics.currentPathPoint = currentPathPoint;
+                robotKinematics.distanceToTarget = distanceToTarget;
+            }
+            
             // Check if we reached the target
             if (distanceToTarget <= arrivalDistance) {
                 if (!targetReached) {
                     targetReached = true;
-                    robotKinematics.StopRobot();
+                    
+                    if (robotKinematics != null) {
+                        robotKinematics.StopRobot();
+                    }
+                    
                     if (showDebugInfo) Debug.Log("Target reached!");
                 }
             } else {
                 targetReached = false;
-                robotKinematics.ApplySteer();
-                robotKinematics.Drive();
+                
+                if (robotKinematics != null) {
+                    robotKinematics.ApplySteer();
+                    robotKinematics.Drive();
+                }
             }
         }
     }

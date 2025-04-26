@@ -6,7 +6,7 @@ public class TargetController : MonoBehaviour
     [Header("Target Settings")]
     public GameObject targetMarker;
     public float markerHeight = 0.1f;
-    public RobotKinematics robotKinematics;
+    public RobotPathfinding robotPathfinding;
     public Camera targetCamera; // Allow manual camera assignment
     
     [Header("Visual Settings")]
@@ -63,12 +63,12 @@ public class TargetController : MonoBehaviour
         }
         
         // Find robot kinematics if not assigned
-        if (robotKinematics == null)
+        if (robotPathfinding == null)
         {
-            robotKinematics = FindObjectOfType<RobotKinematics>();
-            if (robotKinematics == null)
+            robotPathfinding = FindObjectOfType<RobotPathfinding>();
+            if (robotPathfinding == null)
             {
-                Debug.LogError("No RobotKinematics component found in the scene! Please assign it manually.");
+                Debug.LogError("No robotPathfinding component found in the scene! Please assign it manually.");
             }
         }
     }
@@ -108,9 +108,9 @@ public class TargetController : MonoBehaviour
                     }
                     
                     // Update the robot's target
-                    if (robotKinematics != null)
+                    if (robotPathfinding != null)
                     {
-                        robotKinematics.target = targetMarker.transform;
+                        robotPathfinding.target = targetMarker.transform;
                     }
                 }
                 else
