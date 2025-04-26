@@ -3,42 +3,33 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
-public class RobotKinematics : MonoBehaviour
-{
-    [Header("Wheel Components")]
-    public WheelCollider frontLeftWheel;
-    public WheelCollider frontRightWheel;
-    
-    [Header("Robot Parameters")]
-    public float maxSteeringAngle = 40f;
-    public float motorTorque = 10f;
-    public float brakeTorque = 100f;
-
+public class RobotPathfinding: MonoBehaviour{
+    [Header("Robot Kinematics")]
+    public RobotKinematics robotKinematics;
     [Header("NavMesh Parameters")]
     public float lookAheadDistance = 2.0f;
     public Transform target;
     public bool debugPath = true;
-    
     [Header("Target Detection")]
     public float arrivalDistance = 1.0f;
     public float slowingDistance = 3.0f;
     public bool showDebugInfo = true;
-
     private NavMeshPath navPath;
     private Vector3 currentPathPoint;
     private int currentPathIndex = 0;
     private bool targetReached = false;
     private float distanceToTarget = float.MaxValue;
-    
-    void Start() {
+
+
+    void Start()
+    {
         navPath = new NavMeshPath();
-        
-        // Initialize with current position if no target
-        if (target == null) {
+
+        if (target == null){
             currentPathPoint = transform.position;
         }
     }
-    
+
     void FixedUpdate() {
         UpdatePath();
         
@@ -50,13 +41,13 @@ public class RobotKinematics : MonoBehaviour
             if (distanceToTarget <= arrivalDistance) {
                 if (!targetReached) {
                     targetReached = true;
-                    StopRobot();
+                    robotKinematics.StopRobot();
                     if (showDebugInfo) Debug.Log("Target reached!");
                 }
             } else {
                 targetReached = false;
-                ApplySteer();
-                Drive();
+                robotKinematics.ApplySteer();
+                robotKinematics.Drive();
             }
         }
     }
@@ -87,47 +78,6 @@ public class RobotKinematics : MonoBehaviour
                 currentPathPoint = navPath.corners[currentPathIndex];
             }
         }
-    }
-
-    public void ApplySteer() {
-        // Calculate steering based on path point
-        Vector3 relativeVector = transform.InverseTransformPoint(currentPathPoint);
-        float newSteer = (relativeVector.x / relativeVector.magnitude) * maxSteeringAngle;
-        
-        // Apply steering to wheels
-        frontLeftWheel.steerAngle = newSteer;
-        frontRightWheel.steerAngle = newSteer;
-    }
-    
-    public void Drive() {
-        // Apply speed reduction when approaching target
-        float speedFactor = 1.0f;
-        
-        if (distanceToTarget < slowingDistance) {
-            // Calculate a factor between 0 and 1 based on distance
-            speedFactor = Mathf.Clamp01(distanceToTarget / slowingDistance);
-            
-            // Apply a curve to make deceleration smoother
-            speedFactor = speedFactor * speedFactor;
-        }
-        
-        // Apply torque with speed factor
-        frontLeftWheel.motorTorque = motorTorque * speedFactor;
-        frontRightWheel.motorTorque = motorTorque * speedFactor;
-        
-        // Apply zero brake when moving
-        frontLeftWheel.brakeTorque = 0f;
-        frontRightWheel.brakeTorque = 0f;
-    }
-    
-    public void StopRobot() {
-        // Stop motor torque
-        frontLeftWheel.motorTorque = 0f;
-        frontRightWheel.motorTorque = 0f;
-        
-        // Apply brakes to stop the robot
-        frontLeftWheel.brakeTorque = brakeTorque;
-        frontRightWheel.brakeTorque = brakeTorque;
     }
 
     private void OnDrawGizmos() {
