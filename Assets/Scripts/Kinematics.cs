@@ -77,8 +77,8 @@ public class RobotKinematics : MonoBehaviour
         else
         {
             // Reverse motion - invert the angular component for correct reversing behavior
-            leftWheelSpeed = linearVelocity - angularComponent/2;
-            rightWheelSpeed = linearVelocity + angularComponent/2;
+            leftWheelSpeed = linearVelocity - angularComponent;
+            rightWheelSpeed = linearVelocity + angularComponent;
         }
         
         // Apply motor torques to the wheels
