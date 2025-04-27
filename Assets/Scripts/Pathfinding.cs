@@ -40,7 +40,9 @@ public class RobotPathfinding: MonoBehaviour{
 
     void FixedUpdate() {
         UpdatePath();
-        
+        robotKinematics.Sensors();
+        robotKinematics.LerpToSteerAngle();
+
         if (target) {
             // Calculate distance to target
             distanceToTarget = Vector3.Distance(transform.position, target.position);
