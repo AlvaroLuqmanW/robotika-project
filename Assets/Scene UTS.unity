@@ -16126,6 +16126,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1410372231}
+    - targetCorrespondingSourceObject: {fileID: 1283037223, guid: 78f66e17931a4e5449da398ea3d1f94c,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1410372233}
+    - targetCorrespondingSourceObject: {fileID: 1283037223, guid: 78f66e17931a4e5449da398ea3d1f94c,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1410372232}
     - targetCorrespondingSourceObject: {fileID: 2126553635, guid: 78f66e17931a4e5449da398ea3d1f94c,
         type: 3}
       insertIndex: -1
@@ -21553,7 +21561,6 @@ MonoBehaviour:
   showOptimizedPath: 1
   currentTargetIndex: -1
   routeComplete: 0
-  optimizationMethod: 0
 --- !u!114 &1410372229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21586,6 +21593,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bombDetectRange: 20
+--- !u!114 &1410372232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1410372217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76d320fc686f43d4ebe8189a5aa320a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  multiTargetPathfinder: {fileID: 1410372228}
+  pathfinding: {fileID: 1410372226}
+  localAStarSearch: {fileID: 1410372233}
+--- !u!114 &1410372233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1410372217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d78968d9e1624247b94bf21b54e577e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pathfinding: {fileID: 1410372226}
+  robotTransform: {fileID: 0}
+  nodeSpacing: 2
+  searchRadius: 15
+  bombDetectRange: 3
+  drawGridGizmos: 1
+  gridColor: {r: 0, g: 1, b: 1, a: 1}
+  visitedColor: {r: 1, g: 0, b: 0, a: 1}
+  isSearching: 0
 --- !u!1001 &1412547601
 PrefabInstance:
   m_ObjectHideFlags: 0
