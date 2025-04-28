@@ -5206,6 +5206,7 @@ Transform:
   - {fileID: 535951492}
   - {fileID: 1290436397}
   - {fileID: 320344004}
+  - {fileID: 1125730584}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &379105612
@@ -8407,6 +8408,9 @@ GameObject:
   - component: {fileID: 605943357}
   - component: {fileID: 605943356}
   - component: {fileID: 605943355}
+  - component: {fileID: 605943361}
+  - component: {fileID: 605943360}
+  - component: {fileID: 605943362}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -8491,6 +8495,60 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &605943360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 605943354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7b914e49a35acf4b9e8fb1f71f8c51e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boundaryManager: {fileID: 0}
+  missionCoordinator: {fileID: 0}
+  pathfinding: {fileID: 0}
+  <IsFinished>k__BackingField: 0
+  openNodes: []
+  searching: 0
+  nodeSpacing: 2
+  searchRadius: 15
+  bombDetectRange: 4
+--- !u!114 &605943361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 605943354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f3df98870ffa7949b9535897d17002c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boundaryManager: {fileID: 0}
+  searcher: {fileID: 0}
+  pathfinding: {fileID: 0}
+  state: 0
+  <areaIdx>k__BackingField: 0
+--- !u!114 &605943362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 605943354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b600a2fb2d7a6d84482255d03afb32c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapWidth: 100
+  mapHeight: 100
+  gridSpacing: 5
+  gridPoints: []
 --- !u!1001 &610120998
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -16064,6 +16122,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1410372228}
+    - targetCorrespondingSourceObject: {fileID: 1283037223, guid: 78f66e17931a4e5449da398ea3d1f94c,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1410372231}
     - targetCorrespondingSourceObject: {fileID: 2126553635, guid: 78f66e17931a4e5449da398ea3d1f94c,
         type: 3}
       insertIndex: -1
@@ -17594,6 +17656,37 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1123722869}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1125730583
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1125730584}
+  m_Layer: 0
+  m_Name: Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1125730584
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1125730583}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 375194868}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1131600982
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21419,6 +21512,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pathfinding: {fileID: 1410372226}
   kinematics: {fileID: 1410372224}
+  localization: {fileID: 0}
   autoConnect: 1
   autoFind: 1
 --- !u!114 &1410372226
@@ -21479,6 +21573,19 @@ MonoBehaviour:
   - {x: 59.98, y: 2.084, z: 14.85}
   returnToStart: 0
   startDelay: 1
+--- !u!114 &1410372231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1410372217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d2c460f58cc913469dd06dd9fbd376b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bombDetectRange: 20
 --- !u!1001 &1412547601
 PrefabInstance:
   m_ObjectHideFlags: 0

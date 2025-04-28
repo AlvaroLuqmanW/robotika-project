@@ -13,6 +13,8 @@ public class BombCounter : MonoBehaviour
 
     [SerializeField] int bombCount = 0;
 
+    public int RemainingBombs => bombCount;
+
     void Awake(){
         if(instance == null){
             instance = this;
