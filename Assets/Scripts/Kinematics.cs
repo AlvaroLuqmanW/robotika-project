@@ -198,7 +198,7 @@ public class RobotKinematics : MonoBehaviour
         if (avoidMultiplier == 0){
             // Front center sensor - multiple raycasts for width
             float raySpacing = centerSensorWidth / (centerSensorRays - 1);
-            Vector3 centerStartPos = sensorStartPos - transform.right * (centerSensorWidth * 0.5f);
+            Vector3 centerStartPos = transform.position - transform.right * (centerSensorWidth * 0.5f);
             
             for (int i = 0; i < centerSensorRays; i++) {
                 Vector3 rayPos = centerStartPos + transform.right * (raySpacing * i);

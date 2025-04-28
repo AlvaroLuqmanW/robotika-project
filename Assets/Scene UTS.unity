@@ -21304,7 +21304,7 @@ MonoBehaviour:
   backRightWheel: {fileID: 224111261}
   backLeftWheel: {fileID: 1112242512}
   maxSteeringAngle: 40
-  motorTorque: 6
+  motorTorque: 8
   brakeTorque: 1000
   turnSpeed: 5
   turnResponsiveness: 1
