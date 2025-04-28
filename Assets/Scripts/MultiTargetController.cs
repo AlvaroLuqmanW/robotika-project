@@ -11,8 +11,8 @@ public class MultiTargetController : MonoBehaviour
     public MultiTargetPathfinder pathfinder;
     
     [Header("Target Settings")]
-    [Tooltip("Target GameObjects to navigate to")]
-    public GameObject[] targets = new GameObject[3];
+    [Tooltip("Target positions to navigate to")]
+    public Vector3[] targetPositions = new Vector3[3];
     
     [Tooltip("Should the robot return to starting position after visiting all targets?")]
     public bool returnToStart = true;
@@ -56,27 +56,44 @@ public class MultiTargetController : MonoBehaviour
     }
     
     /// <summary>
-    /// Add targets from the inspector array to the pathfinder
+    /// Add target positions from the inspector array to the pathfinder
     /// </summary>
     private void AddTargetsToPathfinder()
     {
         pathfinder.targets.Clear();
         
-        foreach (GameObject target in targets)
+        foreach (Vector3 position in targetPositions)
         {
-            if (target != null)
-            {
-                pathfinder.targets.Add(target.transform);
-            }
+            // Create a temporary transform to represent the target position
+            GameObject tempTarget = new GameObject("TempTarget");
+            tempTarget.transform.position = position;
+            pathfinder.targets.Add(tempTarget.transform);
         }
         
         if (pathfinder.targets.Count == 0)
         {
-            Debug.LogWarning("No targets set for multi-target navigation!");
+            Debug.LogWarning("No target positions set for multi-target navigation!");
         }
         else
         {
-            Debug.Log("Added " + pathfinder.targets.Count + " targets to pathfinder");
+            Debug.Log("Added " + pathfinder.targets.Count + " target positions to pathfinder");
+        }
+    }
+    
+    /// <summary>
+    /// Clean up temporary target objects when the script is disabled
+    /// </summary>
+    private void OnDisable()
+    {
+        if (pathfinder != null)
+        {
+            foreach (Transform target in pathfinder.targets)
+            {
+                if (target != null && target.name == "TempTarget")
+                {
+                    Destroy(target.gameObject);
+                }
+            }
         }
     }
 } 
