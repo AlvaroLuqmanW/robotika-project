@@ -39,6 +39,8 @@ public class RobotPathfinding: MonoBehaviour{
     }
 
     void FixedUpdate() {
+        if (robotKinematics == null) return;
+        
         UpdatePath();
         robotKinematics.Sensors();
         robotKinematics.LerpToSteerAngle();
@@ -48,29 +50,23 @@ public class RobotPathfinding: MonoBehaviour{
             distanceToTarget = Vector3.Distance(transform.position, target.position);
             
             // Sync with kinematics
-            if (robotKinematics != null) {
-                robotKinematics.currentPathPoint = currentPathPoint;
-                robotKinematics.distanceToTarget = distanceToTarget;
-            }
+            robotKinematics.currentPathPoint = currentPathPoint;
+            robotKinematics.distanceToTarget = distanceToTarget;
             
             // Check if we reached the target
             if (distanceToTarget <= arrivalDistance) {
                 if (!targetReached) {
                     targetReached = true;
-                    
-                    if (robotKinematics != null) {
-                        robotKinematics.StopRobot();
-                    }
+                    robotKinematics.StopRobot();
                     
                     if (showDebugInfo) Debug.Log("Target reached!");
                 }
             } else {
                 targetReached = false;
                 
-                if (robotKinematics != null) {
-                    robotKinematics.ApplySteer();
-                    robotKinematics.Drive();
-                }
+                // Let the robot drive unless it's currently recovering from a collision
+                robotKinematics.ApplySteer();
+                robotKinematics.Drive();
             }
         }
     }

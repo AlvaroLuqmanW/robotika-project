@@ -36,14 +36,40 @@ public class RobotKinematics : MonoBehaviour
     public Vector3 frontSensorPosition = new Vector3(0, -0.05f, 0);
     public float frontSideSensorPosition = -0.3f;
     public float forntSideSensorAngle = 30;
+    [Tooltip("Width of the center sensor in meters")]
+    public float centerSensorWidth = 0.5f;
+    [Tooltip("Number of raycasts to use for center sensor")]
+    public int centerSensorRays = 3;
     private bool isAvoiding = false;
     private float targetSteerAngle = 0f;
+    
+    [Header("Collision Recovery")]
+    public float minVelocityThreshold = 0.1f;
+    public float reverseTorque = 8f;
+    private bool isReversing = false;
+    private Rigidbody rb;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        if (rb == null)
+        {
+            rb = gameObject.AddComponent<Rigidbody>();
+            Debug.LogWarning("Rigidbody component was missing and has been added automatically.");
+        }
+    }
+
+    void Update()
+    {
+        // No longer need the timer-based approach
+        // We'll continue reversing until sensors don't detect obstacles
+    }
 
     /// <summary>
     /// Applies steering to the front wheels based on the target point
     /// </summary>
     public void ApplySteer() {
-        if (isAvoiding) return;
+        if (isAvoiding || isReversing) return;
         // Calculate steering based on path point
         Vector3 relativeVector = transform.InverseTransformPoint(currentPathPoint);
         float newSteer = (relativeVector.x / relativeVector.magnitude) * maxSteeringAngle;
@@ -56,6 +82,11 @@ public class RobotKinematics : MonoBehaviour
     /// Applies motor torque to the wheels with speed reduction based on distance to target
     /// </summary>
     public void Drive() {
+        if (isReversing) {
+            ReverseRobot();
+            return;
+        }
+        
         // Apply speed reduction when approaching target
         float speedFactor = 1.0f;
         
@@ -72,6 +103,23 @@ public class RobotKinematics : MonoBehaviour
         frontRightWheel.motorTorque = motorTorque * speedFactor;
         backLeftWheel.motorTorque = motorTorque * speedFactor;
         backRightWheel.motorTorque = motorTorque * speedFactor;
+        
+        // Apply zero brake when moving
+        frontLeftWheel.brakeTorque = 0f;
+        frontRightWheel.brakeTorque = 0f;
+        backLeftWheel.brakeTorque = 0f;
+        backRightWheel.brakeTorque = 0f;
+    }
+    
+    /// <summary>
+    /// Applies reverse torque to move the robot backward
+    /// </summary>
+    public void ReverseRobot() {
+        // Apply negative torque to move backward
+        frontLeftWheel.motorTorque = -reverseTorque;
+        frontRightWheel.motorTorque = -reverseTorque;
+        backLeftWheel.motorTorque = -reverseTorque;
+        backRightWheel.motorTorque = -reverseTorque;
         
         // Apply zero brake when moving
         frontLeftWheel.brakeTorque = 0f;
@@ -107,6 +155,7 @@ public class RobotKinematics : MonoBehaviour
         sensorStartPos += transform.up * frontSensorPosition.y;
         float avoidMultiplier = 0;
         isAvoiding = false;
+        bool centerSensorHit = false;
 
         // Front right sensor
         sensorStartPos -= transform.right * frontSideSensorPosition;
@@ -147,22 +196,45 @@ public class RobotKinematics : MonoBehaviour
         }
 
         if (avoidMultiplier == 0){
-            // Front center sensor
-            if (Physics.Raycast(sensorStartPos, transform.forward, out hit, sensorLength)){
-                if (hit.collider.CompareTag("Obstacles")){
-                    Debug.DrawLine(sensorStartPos, hit.point);
-                    isAvoiding = true;
-                    if (hit.normal.x < 0){
-                        avoidMultiplier = 1;
-                    } 
-                    else {
-                        avoidMultiplier = -1;
+            // Front center sensor - multiple raycasts for width
+            float raySpacing = centerSensorWidth / (centerSensorRays - 1);
+            Vector3 centerStartPos = sensorStartPos - transform.right * (centerSensorWidth * 0.5f);
+            
+            for (int i = 0; i < centerSensorRays; i++) {
+                Vector3 rayPos = centerStartPos + transform.right * (raySpacing * i);
+                if (Physics.Raycast(rayPos, transform.forward, out hit, sensorLength)) {
+                    if (hit.collider.CompareTag("Obstacles")) {
+                        Debug.DrawLine(rayPos, hit.point);
+                        isAvoiding = true;
+                        centerSensorHit = true;
+                        
+                        // Check if robot is stuck by checking velocity when center sensor detects obstacle
+                        float currentSpeed = rb.velocity.magnitude;
+                        
+                        if (currentSpeed < minVelocityThreshold && !isReversing) {
+                            // Robot appears to be stuck, start reversing
+                            isReversing = true;
+                            return;
+                        }
+                        
+                        if (hit.normal.x < 0) {
+                            avoidMultiplier = 1;
+                        } else {
+                            avoidMultiplier = -1;
+                        }
+                        break; // Exit loop after first hit
                     }
                 }
             }
         }
 
-        if (isAvoiding){
+        // Check if we should stop reversing when all sensors don't detect obstacles
+        if (!isAvoiding && isReversing) {
+            isReversing = false;
+            StopRobot(); // Brief stop before resuming normal operation
+        }
+
+        if (isAvoiding && !isReversing){
             targetSteerAngle = maxSteeringAngle * avoidMultiplier;
         }     
     }
