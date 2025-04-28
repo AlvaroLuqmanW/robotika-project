@@ -19,11 +19,12 @@ public class RobotPathfinding: MonoBehaviour{
     private int currentPathIndex = 0;
     private bool targetReached = false;
     private float distanceToTarget = float.MaxValue;
-
+    private RobotController robotController;
 
     void Start()
     {
         navPath = new NavMeshPath();
+        robotController = GetComponent<RobotController>();
 
         if (target == null){
             currentPathPoint = transform.position;
@@ -46,8 +47,9 @@ public class RobotPathfinding: MonoBehaviour{
         robotKinematics.LerpToSteerAngle();
 
         if (target) {
-            // Calculate distance to target
-            distanceToTarget = Vector3.Distance(transform.position, target.position);
+            // Calculate distance to target using estimated position
+            Vector3 currentPosition = robotController.GetEstimatedPosition();
+            distanceToTarget = Vector3.Distance(currentPosition, target.position);
             
             // Sync with kinematics
             robotKinematics.currentPathPoint = currentPathPoint;
@@ -73,7 +75,9 @@ public class RobotPathfinding: MonoBehaviour{
 
     void UpdatePath() {
         if (target != null) {
-            NavMesh.CalculatePath(transform.position, target.position, NavMesh.AllAreas, navPath);
+            // Use estimated position for path calculation
+            Vector3 currentPosition = robotController.GetEstimatedPosition();
+            NavMesh.CalculatePath(currentPosition, target.position, NavMesh.AllAreas, navPath);
             
             if (navPath.corners.Length > 0) {
                 // Find the appropriate path point to steer towards
