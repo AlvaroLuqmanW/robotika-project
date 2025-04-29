@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class RobotPathfinding: MonoBehaviour{
     [Header("Robot Kinematics")]
     public RobotKinematics robotKinematics;
+    public MultiTargetPathfinder multiTargetPathfinder;
     [Header("NavMesh Parameters")]
     public float lookAheadDistance = 2.0f;
     public Transform target;
@@ -65,7 +66,9 @@ public class RobotPathfinding: MonoBehaviour{
             if (distanceToTarget <= arrivalDistance) {
                 if (!targetReached) {
                     targetReached = true;
-                    robotKinematics.StopRobot();
+                    if (!multiTargetPathfinder.isExploringArea){
+                        robotKinematics.StopRobot();
+                    }
                     lastVisitedTarget = target;
                     
                     if (showDebugInfo) Debug.Log("Target reached!");

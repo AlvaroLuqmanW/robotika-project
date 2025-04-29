@@ -17,6 +17,10 @@ public class MultiTargetController : MonoBehaviour
     [Tooltip("Should the robot return to starting position after visiting all targets?")]
     public bool returnToStart = true;
     
+    [Header("Bomb Detection")]
+    [Tooltip("Enable bomb search in each area")]
+    public bool searchForBombs = true;
+    
     [Header("Navigation Settings")]
     [Tooltip("Delay before starting navigation (seconds)")]
     public float startDelay = 1.0f;
@@ -36,6 +40,7 @@ public class MultiTargetController : MonoBehaviour
         
         // Configure pathfinder
         pathfinder.returnToStart = returnToStart;
+        pathfinder.searchForBombs = searchForBombs;
         
         // Add targets from inspector
         AddTargetsToPathfinder();
