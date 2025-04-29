@@ -207,16 +207,7 @@ public class RobotKinematics : MonoBehaviour
                         Debug.DrawLine(rayPos, hit.point);
                         isAvoiding = true;
                         centerSensorHit = true;
-                        
-                        // Check if robot is stuck by checking velocity when center sensor detects obstacle
-                        float currentSpeed = rb.velocity.magnitude;
-                        
-                        if (currentSpeed < minVelocityThreshold && !isReversing) {
-                            // Robot appears to be stuck, start reversing
-                            isReversing = true;
-                            return;
-                        }
-                        
+                                                
                         if (hit.normal.x < 0) {
                             avoidMultiplier = 1;
                         } else {
@@ -228,8 +219,13 @@ public class RobotKinematics : MonoBehaviour
             }
         }
 
-        // Check if we should stop reversing when all sensors don't detect obstacles
-        if (!isAvoiding && isReversing) {
+        float currentSpeed = rb.velocity.magnitude;
+                        
+        if (currentSpeed < minVelocityThreshold && !isReversing && frontLeftWheel.brakeTorque != 0 && frontRightWheel.brakeTorque != 0) {
+            // Robot appears to be stuck, start reversing
+            isReversing = true;
+            
+        } else if (!isAvoiding && isReversing){
             isReversing = false;
             StopRobot(); // Brief stop before resuming normal operation
         }
@@ -244,5 +240,12 @@ public class RobotKinematics : MonoBehaviour
         
         frontLeftWheel.steerAngle = Mathf.Lerp(frontLeftWheel.steerAngle, targetSteerAngle, lerpFactor);
         frontRightWheel.steerAngle = Mathf.Lerp(frontRightWheel.steerAngle, targetSteerAngle, lerpFactor);
+    }
+
+    public void crashHandler(){
+        float currentSpeed = rb.velocity.magnitude;
+        if (currentSpeed < minVelocityThreshold && !isReversing && frontLeftWheel.brakeTorque != 0 && frontRightWheel.brakeTorque != 0){
+            isReversing = true;
+        }
     }
 }

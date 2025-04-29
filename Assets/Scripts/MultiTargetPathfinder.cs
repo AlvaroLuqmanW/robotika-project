@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using System;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -42,7 +44,11 @@ public class MultiTargetPathfinder : MonoBehaviour
     
     // Are we currently processing?
     private bool isProcessing = false;
-    
+    internal Action<Transform> OnTargetReached;
+
+    public delegate void TargetReachedDelegate(Transform target);
+    public event TargetReachedDelegate onTargetReached;
+
     public enum RouteOptimizationMethod
     {
         NearestNeighbor,       // Simple greedy algorithm, fast but suboptimal
@@ -139,7 +145,7 @@ public class MultiTargetPathfinder : MonoBehaviour
     /// <summary>
     /// Move to the next target in the optimized route
     /// </summary>
-    private void MoveToNextTarget()
+    public void MoveToNextTarget()
     {
         if (!isProcessing || optimizedRoute.Count == 0)
             return;
@@ -212,8 +218,47 @@ public class MultiTargetPathfinder : MonoBehaviour
                 // Target reached
                 Debug.Log("Target reached!");
                 
-                // Move to next target
-                MoveToNextTarget();
+                // Notify event subscribers
+                Transform currentTarget = null;
+                
+                // Only notify for our main targets, not temporary ones
+                if (currentTargetIndex >= 0 && currentTargetIndex < optimizedRoute.Count)
+                {
+                    int targetIndex = optimizedRoute[currentTargetIndex];
+                    if (targetIndex >= 0 && targetIndex < targets.Count)
+                    {
+                        currentTarget = targets[targetIndex];
+                        
+                        // Trigger events
+                        if (OnTargetReached != null)
+                        {
+                            Debug.Log("Calling OnTargetReached delegate");
+                            OnTargetReached(currentTarget);
+                        }
+                        
+                        if (onTargetReached != null)
+                        {
+                            Debug.Log("Calling onTargetReached event");
+                            onTargetReached(currentTarget);
+                        }
+                        
+                        // Important! Wait for external handlers to do their work
+                        yield return new WaitForSeconds(1.0f);
+                    }
+                }
+                
+                // Check if we're still in the same position - if so, no handler took control,
+                // so we should move to the next target automatically
+                if (Vector3.Distance(transform.position, pathfinding.target.position) <= pathfinding.arrivalDistance)
+                {
+                    // Only automatically move to next target if no event handler took control
+                    if (OnTargetReached == null && onTargetReached == null)
+                    {
+                        Debug.Log("No target reached handlers registered, automatically moving to next target");
+                        // Move to next target
+                        MoveToNextTarget();
+                    }
+                }
             }
             
             yield return new WaitForSeconds(checkInterval);
@@ -433,5 +478,22 @@ public class MultiTargetPathfinder : MonoBehaviour
                 #endif
             }
         }
+    }
+
+    public void ContinueToNextTarget()
+    {
+        // Move to the next target in the sequence
+        currentTargetIndex++;
+        
+        // Check if we've reached the end of the targets
+        if (currentTargetIndex >= optimizedRoute.Count)
+        {
+            Debug.Log("All targets visited!");
+            // Handle completion
+            return;
+        }
+        
+        // Navigate to the next target
+        MoveToNextTarget();
     }
 } 
