@@ -20,6 +20,7 @@ public class RobotPathfinding: MonoBehaviour{
     private bool targetReached = false;
     private float distanceToTarget = float.MaxValue;
     private RobotController robotController;
+    private Transform lastVisitedTarget = null;
 
     void Start()
     {
@@ -47,6 +48,11 @@ public class RobotPathfinding: MonoBehaviour{
         robotKinematics.LerpToSteerAngle();
 
         if (target) {
+            // Check if target has changed
+            if (target != lastVisitedTarget) {
+                targetReached = false;
+            }
+            
             // Calculate distance to target using estimated position
             Vector3 currentPosition = robotController.GetEstimatedPosition();
             distanceToTarget = Vector3.Distance(currentPosition, target.position);
@@ -60,6 +66,7 @@ public class RobotPathfinding: MonoBehaviour{
                 if (!targetReached) {
                     targetReached = true;
                     robotKinematics.StopRobot();
+                    lastVisitedTarget = target;
                     
                     if (showDebugInfo) Debug.Log("Target reached!");
                 }

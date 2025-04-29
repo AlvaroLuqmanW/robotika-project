@@ -10,8 +10,9 @@ public class AreaGridGenerator : MonoBehaviour
     public bool showGrid = true; // Toggle grid visualization
     public Color gridColor = new Color(0, 1, 0, 0.3f); // Color for grid visualization
     public float obstacleCheckRadius = 0.25f; // Radius to check for obstacles
+    public GameObject gridPointPrefab; // Prefab to instantiate for each grid point
 
-    private List<Vector3> gridPoints = new List<Vector3>();
+    private List<GameObject> gridObjects = new List<GameObject>();
     private Transform[] cornerPoints;
     private Bounds areaBounds;
 
@@ -122,13 +123,25 @@ public class AreaGridGenerator : MonoBehaviour
 
     private void GenerateGrid()
     {
-        gridPoints.Clear();
+        // Clear any existing grid objects
+        ClearGrid();
 
         // Calculate grid dimensions
         float width = areaBounds.size.x;
         float length = areaBounds.size.z;
         int pointsX = Mathf.CeilToInt(width / gridSpacing);
         int pointsZ = Mathf.CeilToInt(length / gridSpacing);
+
+        // Make sure we have a prefab
+        if (gridPointPrefab == null)
+        {
+            Debug.LogError("Grid Point Prefab is not assigned!");
+            return;
+        }
+
+        // Create a parent object for grid points
+        Transform gridParent = new GameObject("Grid Points").transform;
+        gridParent.SetParent(transform);
 
         // Generate grid points
         for (int x = 0; x <= pointsX; x++)
@@ -155,7 +168,10 @@ public class AreaGridGenerator : MonoBehaviour
                         // Check if point collides with obstacle
                         if (!IsPointCollidingWithObstacle(point))
                         {
-                            gridPoints.Add(point);
+                            // Instantiate grid point GameObject
+                            GameObject gridObject = Instantiate(gridPointPrefab, point, Quaternion.identity, gridParent);
+                            gridObject.name = $"GridPoint_X{x}_Z{z}";
+                            gridObjects.Add(gridObject);
                         }
                     }
                 }
@@ -163,49 +179,122 @@ public class AreaGridGenerator : MonoBehaviour
         }
     }
 
+    private void ClearGrid()
+    {
+        // Destroy all existing grid GameObjects
+        foreach (GameObject gridObject in gridObjects)
+        {
+            if (gridObject != null)
+            {
+                DestroyImmediate(gridObject);
+            }
+        }
+        
+        // Clear the list
+        gridObjects.Clear();
+        
+        // Remove any existing grid parent
+        Transform gridParent = transform.Find("Grid Points");
+        if (gridParent != null)
+        {
+            DestroyImmediate(gridParent.gameObject);
+        }
+    }
+
+    public List<GameObject> GetGridObjects()
+    {
+        return gridObjects;
+    }
+
     public List<Vector3> GetGridPoints()
     {
-        return gridPoints;
+        List<Vector3> points = new List<Vector3>();
+        foreach (GameObject obj in gridObjects)
+        {
+            if (obj != null)
+            {
+                points.Add(obj.transform.position);
+            }
+        }
+        return points;
+    }
+
+    public GameObject GetNearestGridObject(Vector3 position)
+    {
+        GameObject nearestObject = null;
+        float minDistance = float.MaxValue;
+
+        foreach (GameObject obj in gridObjects)
+        {
+            if (obj != null)
+            {
+                float distance = Vector3.Distance(position, obj.transform.position);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    nearestObject = obj;
+                }
+            }
+        }
+
+        return nearestObject;
     }
 
     public Vector3 GetNearestGridPoint(Vector3 position)
     {
-        Vector3 nearestPoint = Vector3.zero;
-        float minDistance = float.MaxValue;
-
-        foreach (Vector3 point in gridPoints)
-        {
-            float distance = Vector3.Distance(position, point);
-            if (distance < minDistance)
-            {
-                minDistance = distance;
-                nearestPoint = point;
-            }
-        }
-
-        return nearestPoint;
+        GameObject nearestObject = GetNearestGridObject(position);
+        return nearestObject != null ? nearestObject.transform.position : Vector3.zero;
     }
 
     private void OnDrawGizmos()
     {
-        if (!showGrid || gridPoints.Count == 0)
+        if (!showGrid)
             return;
-
-        Gizmos.color = gridColor;
-        foreach (Vector3 point in gridPoints)
+            
+        // If in edit mode, we might not have grid objects, so draw based on corner points
+        if (gridObjects.Count == 0 && cornerPoints != null && cornerPoints.Length == 4)
         {
-            Gizmos.DrawSphere(point, 0.1f);
+            // Draw area boundaries
+            Gizmos.color = Color.red;
+            for (int i = 0; i < 4; i++)
+            {
+                int next = (i + 1) % 4;
+                if (cornerPoints[i] != null && cornerPoints[next] != null)
+                {
+                    Gizmos.DrawLine(cornerPoints[i].position, cornerPoints[next].position);
+                }
+            }
+            return;
+        }
+
+        // Draw grid points (if the game is running, we'll have actual grid objects)
+        Gizmos.color = gridColor;
+        foreach (GameObject obj in gridObjects)
+        {
+            if (obj != null)
+            {
+                Gizmos.DrawSphere(obj.transform.position, 0.1f);
+            }
         }
 
         // Draw area boundaries
-        Gizmos.color = Color.red;
-        for (int i = 0; i < 4; i++)
+        if (cornerPoints != null && cornerPoints.Length == 4)
         {
-            int next = (i + 1) % 4;
-            if (cornerPoints[i] != null && cornerPoints[next] != null)
+            Gizmos.color = Color.red;
+            for (int i = 0; i < 4; i++)
             {
-                Gizmos.DrawLine(cornerPoints[i].position, cornerPoints[next].position);
+                int next = (i + 1) % 4;
+                if (cornerPoints[i] != null && cornerPoints[next] != null)
+                {
+                    Gizmos.DrawLine(cornerPoints[i].position, cornerPoints[next].position);
+                }
             }
         }
+    }
+
+    // Call this method to regenerate the grid at runtime
+    public void RegenerateGrid()
+    {
+        GenerateGrid();
     }
 } 

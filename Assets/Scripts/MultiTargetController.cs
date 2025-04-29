@@ -12,7 +12,7 @@ public class MultiTargetController : MonoBehaviour
     
     [Header("Target Settings")]
     [Tooltip("Target positions to navigate to")]
-    public Vector3[] targetPositions = new Vector3[3];
+    public GameObject[] targetPositions = new GameObject[3];
     
     [Tooltip("Should the robot return to starting position after visiting all targets?")]
     public bool returnToStart = true;
@@ -62,12 +62,10 @@ public class MultiTargetController : MonoBehaviour
     {
         pathfinder.targets.Clear();
         
-        foreach (Vector3 position in targetPositions)
+        foreach (GameObject gameObject in targetPositions)
         {
             // Create a temporary transform to represent the target position
-            GameObject tempTarget = new GameObject("TempTarget");
-            tempTarget.transform.position = position;
-            pathfinder.targets.Add(tempTarget.transform);
+            pathfinder.targets.Add(gameObject.transform);
         }
         
         if (pathfinder.targets.Count == 0)
