@@ -48,6 +48,7 @@ public class RobotKinematics : MonoBehaviour
     public float reverseTorque = 8f;
     private bool isReversing = false;
     private Rigidbody rb;
+    public bool isStopping = false;
 
     void Awake()
     {
@@ -69,6 +70,10 @@ public class RobotKinematics : MonoBehaviour
     /// Applies steering to the front wheels based on the target point
     /// </summary>
     public void ApplySteer() {
+        if (isStopping) {
+            return;
+        }
+
         if (isAvoiding || isReversing) return;
         // Calculate steering based on path point
         Vector3 relativeVector = transform.InverseTransformPoint(currentPathPoint);
@@ -82,6 +87,10 @@ public class RobotKinematics : MonoBehaviour
     /// Applies motor torque to the wheels with speed reduction based on distance to target
     /// </summary>
     public void Drive() {
+        if (isStopping) {
+            return;
+        }
+
         if (isReversing) {
             ReverseRobot();
             return;
@@ -115,6 +124,9 @@ public class RobotKinematics : MonoBehaviour
     /// Applies reverse torque to move the robot backward
     /// </summary>
     public void ReverseRobot() {
+        if (isStopping) {
+            return;
+        }
         // Apply negative torque to move backward
         frontLeftWheel.motorTorque = -reverseTorque;
         frontRightWheel.motorTorque = -reverseTorque;
@@ -133,6 +145,7 @@ public class RobotKinematics : MonoBehaviour
     /// </summary>
     public void StopRobot() {
         // Stop motor torque
+        isStopping = true;
         frontLeftWheel.motorTorque = 0f;
         frontRightWheel.motorTorque = 0f;
         backLeftWheel.motorTorque = 0f;
@@ -240,6 +253,9 @@ public class RobotKinematics : MonoBehaviour
     }
 
     public void LerpToSteerAngle(){
+        if (isStopping) {
+            return;
+        }
         float lerpFactor = Mathf.Clamp01(Time.deltaTime * turnSpeed * (1 + turnResponsiveness * 5));
         
         frontLeftWheel.steerAngle = Mathf.Lerp(frontLeftWheel.steerAngle, targetSteerAngle, lerpFactor);

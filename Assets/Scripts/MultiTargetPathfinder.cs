@@ -14,6 +14,7 @@ public class MultiTargetPathfinder : MonoBehaviour
 {
     [Header("References")]
     public RobotController robotController;
+    public RobotKinematics robotKinematics;
     public RobotPathfinding pathfinding;
     
     [Header("Target Settings")]
@@ -165,7 +166,7 @@ public class MultiTargetPathfinder : MonoBehaviour
                 Destroy(tempTarget, 0.1f);
                 
                 // Mark as complete once we reach the start
-                StartCoroutine(CheckReturnToStartRoutine());
+                CheckReturnToStartRoutine();
             }
             else
             {
@@ -206,11 +207,19 @@ public class MultiTargetPathfinder : MonoBehaviour
             
             if (distance <= pathfinding.arrivalDistance)
             {
-                // Wait a bit to make sure we've really stopped
-                yield return new WaitForSeconds(0.5f);
                 
                 // Target reached
                 Debug.Log("Target reached!");
+
+                // Scan for bomb at this location
+                SearchArea();
+                
+                // Wait until the area search is complete before proceeding
+                // We'll use a short interval to check if isProcessing was set back to true by the SearchAreaCoroutine
+                while (!isProcessing)
+                {
+                    yield return new WaitForSeconds(0.2f);
+                }
                 
                 // Move to next target
                 MoveToNextTarget();
@@ -381,6 +390,52 @@ public class MultiTargetPathfinder : MonoBehaviour
         }
         
         return length;
+    }
+    
+    /// <summary>
+    /// Searches the gridded area for bombs
+    /// </summary>
+    private void SearchArea()
+    {
+        // Get the neartest GameObject with the AreaGridGenerator component
+        AreaGridGenerator areaGridGenerator = FindObjectOfType<AreaGridGenerator>();
+        if (areaGridGenerator == null)
+        {
+            Debug.LogError("No AreaGridGenerator found in scene!");
+        }else{
+            Debug.Log("AreaGridGenerator : " + areaGridGenerator.name);
+            
+            // Start the search coroutine and wait for it to complete before continuing
+            StartCoroutine(SearchAreaCoroutine(areaGridGenerator));
+        }
+    }
+    
+    /// <summary>
+    /// Coroutine to perform the area search and force waiting
+    /// </summary>
+    private IEnumerator SearchAreaCoroutine(AreaGridGenerator areaGridGenerator)
+    {
+        // Pause the multi-target navigation process
+        bool wasProcessing = isProcessing;
+        isProcessing = false;
+        
+        Debug.Log("Beginning area search...");
+        
+        // Wait for 3 seconds (or adjust time as needed)
+        yield return new WaitForSeconds(5f);
+        
+        // Add additional search logic here
+        robotKinematics.StopRobot();
+
+        // 
+
+        
+        Debug.Log("Area search complete!");
+
+        robotKinematics.isStopping = false;
+        
+        // Resume multi-target navigation
+        isProcessing = wasProcessing;
     }
     
     private void OnDrawGizmos()

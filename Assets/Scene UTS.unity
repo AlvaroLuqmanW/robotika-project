@@ -7335,6 +7335,7 @@ MonoBehaviour:
   showGrid: 1
   gridColor: {r: 0, g: 1, b: 0, a: 0.3}
   obstacleCheckRadius: 0.25
+  gridPointPrefab: {fileID: 784001123}
 --- !u!1 &526152663
 GameObject:
   m_ObjectHideFlags: 0
@@ -12081,6 +12082,37 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 765197597}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &784001123
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 784001124}
+  m_Layer: 0
+  m_Name: GridPrefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &784001124
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 784001123}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 28.663351, y: -2.3182468, z: -48.801014}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &784332286
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22057,6 +22089,7 @@ MonoBehaviour:
   centerSensorRays: 3
   minVelocityThreshold: 0.1
   reverseTorque: 8
+  isStopping: 0
 --- !u!114 &1410372225
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22106,6 +22139,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   robotController: {fileID: 1410372225}
+  robotKinematics: {fileID: 1410372224}
   pathfinding: {fileID: 1410372226}
   targets: []
   returnToStart: 0
@@ -22127,9 +22161,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pathfinder: {fileID: 1410372228}
   targetPositions:
-  - {x: 78.21, y: 2.081, z: -30.28}
-  - {x: 30.06, y: 1.635, z: -44.03}
-  - {x: 59.98, y: 2.084, z: 14.85}
+  - {fileID: 508078657}
+  - {fileID: 2016816115}
+  - {fileID: 1542301781}
   returnToStart: 0
   startDelay: 1
 --- !u!1001 &1412547601
@@ -25047,6 +25081,7 @@ MonoBehaviour:
   showGrid: 1
   gridColor: {r: 0, g: 1, b: 0, a: 0.3}
   obstacleCheckRadius: 0.25
+  gridPointPrefab: {fileID: 784001123}
 --- !u!1001 &1551826288
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -33403,6 +33438,7 @@ MonoBehaviour:
   showGrid: 1
   gridColor: {r: 0, g: 1, b: 0, a: 0.3}
   obstacleCheckRadius: 0.25
+  gridPointPrefab: {fileID: 784001123}
 --- !u!1 &2016879188
 GameObject:
   m_ObjectHideFlags: 0
@@ -35649,3 +35685,4 @@ SceneRoots:
   - {fileID: 747923531}
   - {fileID: 508078658}
   - {fileID: 2016816116}
+  - {fileID: 784001124}
