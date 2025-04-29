@@ -9,6 +9,7 @@ public class AreaGridGenerator : MonoBehaviour
     public float gridHeight = 0.1f; // Height above ground for grid points
     public bool showGrid = true; // Toggle grid visualization
     public Color gridColor = new Color(0, 1, 0, 0.3f); // Color for grid visualization
+    public float obstacleCheckRadius = 0.25f; // Radius to check for obstacles
 
     private List<Vector3> gridPoints = new List<Vector3>();
     private Transform[] cornerPoints;
@@ -105,6 +106,20 @@ public class AreaGridGenerator : MonoBehaviour
         return inside;
     }
 
+    private bool IsPointCollidingWithObstacle(Vector3 point)
+    {
+        // Check for objects tagged as "Obstacles" using OverlapSphere
+        Collider[] colliders = Physics.OverlapSphere(point, obstacleCheckRadius);
+        foreach (Collider collider in colliders)
+        {
+            if (collider.CompareTag("Obstacles"))
+            {
+                return true; // Point collides with an obstacle
+            }
+        }
+        return false; // No collision with obstacles
+    }
+
     private void GenerateGrid()
     {
         gridPoints.Clear();
@@ -136,7 +151,12 @@ public class AreaGridGenerator : MonoBehaviour
                         // Adjust point to be on NavMesh
                         point = hit.position;
                         point.y += gridHeight; // Raise point above ground
-                        gridPoints.Add(point);
+
+                        // Check if point collides with obstacle
+                        if (!IsPointCollidingWithObstacle(point))
+                        {
+                            gridPoints.Add(point);
+                        }
                     }
                 }
             }
